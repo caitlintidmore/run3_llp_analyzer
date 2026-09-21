@@ -22,23 +22,29 @@ executable = "scripts_condor/runAnalyzer_LPC.sh"
 filesPerJob = 10
 ntupler_version = 'V1p19/Data2023/'
 
+
 #ntupler_version = "V1p19/MC_Summer22EE/v1/sixie/"
 
+if analyzer_str=="TrigEff_mdsnano":analyzer="llp_MuonSystem_CA_TrigEff_mdsnano"
+else:print("Not recognized trigger efficiency analyzer, exiting ...");exit()
 
-if analyzer_str=="TnP":analyzer="llp_MuonSystem_CA_TnP"
-elif analyzer_str=="TnP_mdsnano":analyzer="llp_MuonSystem_CA_TnP_mdsnano"
-elif analyzer_str=="TnP_noClusters":analyzer="llp_MuonSystem_CA_TnP_noClusters"
-elif analyzer_str=="TrigEff":analyzer="llp_MuonSystem_CA_TrigEff"
-elif analyzer_str=="TrigEff_mdsnano":analyzer="llp_MuonSystem_CA_TrigEff_mdsnano"
-elif analyzer_str=="TnP_noClusters_VetoEff":analyzer="llp_MuonSystem_CA_TnP_noClusters_VetoEff"
-elif analyzer_str=="TnP_noClusters_VetoEff_mdsnano":analyzer="llp_MuonSystem_CA_TnP_noClusters_VetoEff_mdsnano"
-else:print("analyzer string not recognized, exiting ...");exit()
+
+# if analyzer_str=="TnP":analyzer="llp_MuonSystem_CA_TnP"
+# elif analyzer_str=="TnP_mdsnano":analyzer="llp_MuonSystem_CA_TnP_mdsnano"
+# elif analyzer_str=="TnP_noClusters":analyzer="llp_MuonSystem_CA_TnP_noClusters"
+# elif analyzer_str=="TrigEff":analyzer="llp_MuonSystem_CA_TrigEff"
+# elif analyzer_str=="TrigEff_mdsnano":analyzer="llp_MuonSystem_CA_TrigEff_mdsnano"
+# elif analyzer_str=="TnP_noClusters_VetoEff":analyzer="llp_MuonSystem_CA_TnP_noClusters_VetoEff"
+# elif analyzer_str=="TnP_noClusters_VetoEff_mdsnano":analyzer="llp_MuonSystem_CA_TnP_noClusters_VetoEff_mdsnano"
+# else:print("analyzer string not recognized, exiting ...");exit()
+
 analyzer_version = 'v11'
-#outputDirectoryBase="/storage/af/group/phys_exotica/delayedjets/displacedJetMuonAnalyzer/Run3/{0}/{1}/".format(ntupler_version, analyzer_version)
-#outputDirectoryBase="/store/group/lpclonglived/amalbert/Data_MC_Comp_TnP/results_from_cache_noSkim/{}/".format(output_end)
-outputDirectoryBase="/store/group/lpclonglived/amalbert/Simulation_Modeling_HNL/2024/{}/".format(output_end)
+
+#output directory
+outputDirectoryBase="/store/group/lpcmds/ctidmore/el9_test/{}/".format(output_end)
 outputDirectory = outputDirectoryBase + sample + "/"
 print(outputDirectory)
+
 os.system(f"eosmkdir {outputDirectoryBase}")
 os.system(f"eosmkdir {outputDirectory}")
 HOME = os.getenv('HOME')
@@ -48,7 +54,10 @@ Analyzer_DIR = ''
 #datasetListDir = Analyzer_DIR + "lists/displacedJetMuonNtuple/{}/".format(ntupler_version)
 #datasetListDir = Analyzer_DIR + "Merged_Cache_InputLists/"
 #datasetListDir = Analyzer_DIR + "lists/MDSNano/v2/Data2024/v2/"
-datasetListDir = Analyzer_DIR + "lists/MDSNano/v2/MC_Summer24/"
+#datasetListDir = Analyzer_DIR + "lists/MDSNano/v2/MC_Summer24/"
+
+#testing this thang out
+datasetListDir = Analyzer_DIR + "lists/test_update_el9/"
 
 
 '''
@@ -104,43 +113,58 @@ print(sample)
 #     print("Couldn't find a valid analyzer tag. Exiting ...")
 #     exit()
 
-if "Run2022E" in sample or "Run2022F" in sample or "Run2022G" in sample or "MC_Summer22EE" in sample:
-    analyzerTag = "Summer22EE"
-    jetVetoMap = "Summer22EE_23Sep2023_RunEFG_v1.root"
-    pileupWeights = "PileupReweight_Summer22EE.root"
-    HMT = "L1_efficiencies_2022_2023_032625-Hists-TEff.root"
-    MET = "METTriggerEff_Summer22.root"
-elif "Run2022C" in sample or "Run2022D" in sample or "MC_Summer22" in sample:
-    analyzerTag = "Summer22"
-    jetVetoMap = "Summer22_23Sep2023_RunCD_v1.root"
-    pileupWeights = "PileupReweight_Summer22.root"
-    HMT = "L1_efficiencies_2022_2023_032625-Hists-TEff.root"
-    MET = "METTriggerEff_Summer22EE.root"
-elif "Run2023D" in sample or "MC_Summer23BPix" in sample:
-    analyzerTag = "Summer23BPix"
-    jetVetoMap = "Summer23BPixPrompt23_RunD_v1.root"
-    pileupWeights = "PileupReweight_Summer23BPix.root"
-    HMT = "L1_efficiencies_2022_2023_032625-Hists-TEff.root"
-    MET = "METTriggerEff_Summer23.root"
-elif "Run2023B" in sample or "Run2023C" in sample or "MC_Summer23" in sample:
-    analyzerTag = "Summer23"
-    jetVetoMap = "Summer23Prompt23_RunC_v1.root"
-    pileupWeights = "PileupReweight_Summer23.root"
-    HMT = "L1_efficiencies_2022_2023_032625-Hists-TEff.root"
-    MET = "METTriggerEff_Summer23BPix.root"
-elif "Run2024" in sample or "MC_Summer24" in sample or "HNL"in sample or "DY" in sample or "Wto" in sample: #need to change if looking at MC bkgs from other years!
+# if "Run2022E" in sample or "Run2022F" in sample or "Run2022G" in sample or "MC_Summer22EE" in sample:
+#     analyzerTag = "Summer22EE"
+#     jetVetoMap = "Summer22EE_23Sep2023_RunEFG_v1.root"
+#     pileupWeights = "PileupReweight_Summer22EE.root"
+#     HMT = "L1_efficiencies_2022_2023_032625-Hists-TEff.root"
+#     MET = "METTriggerEff_Summer22.root"
+# elif "Run2022C" in sample or "Run2022D" in sample or "MC_Summer22" in sample:
+#     analyzerTag = "Summer22"
+#     jetVetoMap = "Summer22_23Sep2023_RunCD_v1.root"
+#     pileupWeights = "PileupReweight_Summer22.root"
+#     HMT = "L1_efficiencies_2022_2023_032625-Hists-TEff.root"
+#     MET = "METTriggerEff_Summer22EE.root"
+# elif "Run2023D" in sample or "MC_Summer23BPix" in sample:
+#     analyzerTag = "Summer23BPix"
+#     jetVetoMap = "Summer23BPixPrompt23_RunD_v1.root"
+#     pileupWeights = "PileupReweight_Summer23BPix.root"
+#     HMT = "L1_efficiencies_2022_2023_032625-Hists-TEff.root"
+#     MET = "METTriggerEff_Summer23.root"
+# elif "Run2023B" in sample or "Run2023C" in sample or "MC_Summer23" in sample:
+#     analyzerTag = "Summer23"
+#     jetVetoMap = "Summer23Prompt23_RunC_v1.root"
+#     pileupWeights = "PileupReweight_Summer23.root"
+#     HMT = "L1_efficiencies_2022_2023_032625-Hists-TEff.root"
+#     MET = "METTriggerEff_Summer23BPix.root"
+# elif "Run2024" in sample or "MC_Summer24" in sample or "HNL"in sample or "DY" in sample or "Wto" in sample: #need to change if looking at MC bkgs from other years!
+#     analyzerTag = "Summer24"
+#     jetVetoMap = "Winter24Prompt24_2024BCDEFGHI.root"
+#     pileupWeights = "PileupReweight_Summer24.root"
+#     HMT = "HMT_Efficiencies_2024.root"
+#     MET = "METTriggerEff_Summer24.root"
+# else:
+#     print("Couldn't find a valid analyzer tag. Exiting ...")
+#     exit()
+# #year = datasetList[sample][0]
+# #isData = datasetList[sample][1]
+#if "Run2024" in sample or "MC_Summer24" in sample or "HNL"in sample or "DY" in sample or "Wto" in sample: #need to change if looking at MC bkgs from other years!
+
+if "2024" in sample: #or "MC_Summer24" in sample or "HNL"in sample or "DY" in sample or "Wto" in sample: #need to change if looking at MC bkgs from other years!
     analyzerTag = "Summer24"
     jetVetoMap = "Winter24Prompt24_2024BCDEFGHI.root"
     pileupWeights = "PileupReweight_Summer24.root"
     HMT = "HMT_Efficiencies_2024.root"
     MET = "METTriggerEff_Summer24.root"
 else:
-    print("Couldn't find a valid analyzer tag. Exiting ...")
+    print("Couldn't find a valid 2024 analyzer tag. Exiting ...")
     exit()
-#year = datasetList[sample][0]
-#isData = datasetList[sample][1]
+
+
 if "MC" in sample or "DY" in sample:isData="no"
 else:isData="--isData"
+
+
 #####################################
 #Create Condor JDL file
 #####################################
